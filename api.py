@@ -5,23 +5,35 @@ from flask import Flask
 from flask_restful import Resource, Api
 
 from config import Config
-from utils import get_top_stories, get_story_comment, first_comments
+from utils import get_top_stories, get_story_comment, first_comments, most_used_words_in_comments
 
 app = Flask(__name__)
 api = Api(app)
 
 
-
 class TopComments(Resource):
     def get(self):
-        print("here")
-        top_stories = get_top_stories()
+        top_stories = get_top_stories(Config.TOP_COMMENTS_STORY_NUMBER)
         all_story_comments = []
         for story_id in top_stories:
             all_story_comments.extend(get_story_comment(story_id=story_id))
-        return json.dumps(first_comments(Config.TOP_COMMENTS_NUMBER, all_story_comments))
+        return json.dumps(first_comments(Config.TOP_COMMENTS_COMMENTS_NUMBER, all_story_comments))
+
 
 api.add_resource(TopComments, '/comments')
+
+
+class MostUsedWords(Resource):
+    def get(self):
+        top_stories = get_top_stories(Config.MOST_USED_WORDS_STORY_NUMBER)
+        all_story_comments = []
+        for story_id in top_stories:
+            all_story_comments.extend(get_story_comment(story_id=story_id))
+        comments = first_comments(Config.MOST_USED_WORDS_COMMENTS_NUMBER, all_story_comments)
+        return json.dumps(most_used_words_in_comments(Config.MOST_USED_WORDS_COMMENTS_NUMBER,comments))
+
+
+api.add_resource(MostUsedWords, '/words')
 
 if __name__ == '__main__':
     app.run(debug=True)
