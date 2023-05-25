@@ -5,7 +5,7 @@ import requests
 from config import Config
 
 
-def get_story_comment(story_id: int):
+def get_story_comment(story_id: int , nested : bool):
     URL = Config.HN_URL + str(story_id) + ".json?print=pretty"
     r = requests.get(url=URL)
     data = r.json()
@@ -19,6 +19,8 @@ def get_story_comment(story_id: int):
         item = r.json()
         if item['type'] == "comment":
             comments.append(item)
+        if nested:
+            comments.extend(get_story_comment(kid , nested))
     return comments
 
 
